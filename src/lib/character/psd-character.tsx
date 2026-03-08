@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react"
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 
 import { PsdCharacterElement as PsdElm, type BlockNode, type CharacterNode, type DeclareAnimationNode, type DeclareVariableNode, type MotionNode, type MotionSequenceNode, type VoiceNode } from "./ast"
 import { readPsd, type Psd } from "ag-psd"
@@ -51,10 +51,10 @@ export const PsdCharacter = ({
     }
   }, [myPsd, options, canvas])
 
-  const recompute = () => {
+  const recompute = useCallback(() => {
     const merged = Object.assign({}, ...registry.current.values())
     setOptions(merged)
-  }
+  }, [])
 
   const register = () => {
     const id = crypto.randomUUID()
@@ -126,7 +126,7 @@ export const PsdCharacter = ({
               register={register}
             />
           default:
-            return <div/>
+            return null
         }
       })}
     </>
@@ -144,10 +144,16 @@ const MotionSequenceRuntime = ({
   variables,
   register
 }: MotionSequenceRuntimeProps) => {
-  const {update, getter, unregister} = register()
-  const curRegister: OptionRegister = () => {
-    return {update, getter, unregister}
-  }
+  const reg = useRef(register())
+  const {update, getter, unregister} = reg.current
+
+  useEffect(() => {
+      return () => unregister()
+  }, [])
+
+  const curRegister: OptionRegister = useCallback(() => {
+    return {update, getter, unregister: () => {}}
+  }, [])
 
   return (
     <ClipSequence>
@@ -179,7 +185,7 @@ const MotionSequenceRuntime = ({
               register={curRegister}
             />
           default:
-            return <div/>
+            return null
         }
       }).map((child, i) => <Clip key={i}> {child} </Clip>)}
     </ClipSequence>
@@ -218,7 +224,7 @@ const DeclareVariableRuntime = ({
         register={register}
       />
     default:
-      return <div/>
+      return null
   }
 }
 
@@ -233,7 +239,8 @@ const BlockRuntime = ({
   variables,
   register
 }: BlockRuntimeProps) => {
-  const {update, getter: superGetter, unregister} = register()
+  const reg = useRef(register())
+  const {update, getter: superGetter, unregister} = reg.current
 
   useEffect(() => {
     return () => unregister()
@@ -244,12 +251,12 @@ const BlockRuntime = ({
 
   const [options, setOptions] = useState<PsdOptions>({})
 
-  const recompute = () => {
+  const recompute = useCallback(() => {
     const merged = Object.assign({}, ...curRegistry.current.values())
     setOptions(merged)
-  }
+  }, [])
 
-  const curRegister = () => {
+  const curRegister = useCallback(() => {
     const id = crypto.randomUUID()
 
     curRegistry.current.set(id, {})
@@ -281,7 +288,7 @@ const BlockRuntime = ({
       getter,
       unregister,
     }
-  }
+  }, [])
 
   useEffect(() => {
     update(options)
@@ -322,7 +329,7 @@ const BlockRuntime = ({
               register={curRegister}
             />
           default:
-            return <div/>
+            return null
         }
       })}
     </>
@@ -349,7 +356,8 @@ const DeclareAnimationRuntime = ({
 
   const curVariables = Object.assign(variables, initializingVariables)
 
-  const {update, getter: superGetter, unregister} = register()
+  const reg = useRef(register())
+  const {update, getter: superGetter, unregister} = reg.current
 
   useEffect(() => {
     return () => unregister()
@@ -360,12 +368,12 @@ const DeclareAnimationRuntime = ({
 
   const [options, setOptions] = useState<PsdOptions>({})
 
-  const recompute = () => {
+  const recompute = useCallback(() => {
     const merged = Object.assign({}, ...curRegistry.current.values())
     setOptions(merged)
-  }
+  }, [])
 
-  const curRegister = () => {
+  const curRegister = useCallback(() => {
     const id = crypto.randomUUID()
 
     curRegistry.current.set(id, {})
@@ -397,7 +405,7 @@ const DeclareAnimationRuntime = ({
       getter,
       unregister,
     }
-  }
+  }, [])
 
   useEffect(() => {
     update(options)
@@ -437,7 +445,7 @@ const DeclareAnimationRuntime = ({
               register={curRegister}
             />
           default:
-            return <div/>
+            return null
         }
       })}
     </>
@@ -458,12 +466,12 @@ const VoiceRuntime = ({
   const local_frame = useCurrentFrame()
   const global_frame = useGlobalCurrentFrame()
   const frames = [local_frame, global_frame]
-
+  
   const volume =
     typeof ast.volume === "function"
       ? ast.volume(variables, frames)
       : ast.volume
-
+  
   return (
     <Sound
       sound={ast.voice}
@@ -483,7 +491,8 @@ const MotionRuntime = ({
   variables,
   register
 }: MotionRuntimeProps) => {
-  const { update, getter, unregister } = useMemo(() => register(), [register])
+  const reg = useRef(register())
+  const { update, getter, unregister } = reg.current
 
   useEffect(() => {
     return () => unregister()
@@ -496,7 +505,7 @@ const MotionRuntime = ({
     update(ast.motion(variables, [localTime, globalTime]))
   }, [localTime, globalTime])
 
-  return <div/>
+  return null
 }
 
 
