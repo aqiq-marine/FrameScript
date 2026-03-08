@@ -23,7 +23,7 @@ export const DeclareAnimation = defineDSL<{
 
 export const Voice = defineDSL<{
   voice: string
-  volume?: number | ((variables: Record<string, Variable<any>>, frames: number[]) => number)
+  volume?: number
   children?: React.ReactNode
 }>(PsdCharacterElement.Voice)
 
