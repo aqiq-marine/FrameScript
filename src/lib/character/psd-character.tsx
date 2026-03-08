@@ -36,7 +36,7 @@ export const PsdCharacter = ({
   const registry = useRef(new Map<string, PsdOptions>())
   const order = useRef<string[]>([])
 
-  const [options, setOptions] = useState<PsdOptions>({})
+  const options = useRef<PsdOptions>({})
 
   const canvas = useRef<HTMLCanvasElement>(null)
 
@@ -45,18 +45,22 @@ export const PsdCharacter = ({
     setAst(parsePsdCharacter(children))
   }, [])
 
+  // 毎フレーム実行
+  const frame = useCurrentFrame()
   useEffect(() => {
     if (typeof myPsd !== "undefined" && canvas.current) {
-      renderPsd(myPsd, options, { canvas: canvas.current })
+      renderPsd(myPsd, options.current, { canvas: canvas.current })
     }
-  }, [myPsd, options, canvas])
+  }, [frame])
 
+  // registryをmergeしてoptionsを変更
   const recompute = useCallback(() => {
     const merged = Object.assign({}, ...registry.current.values())
-    setOptions(merged)
+    options.current = merged
   }, [])
 
-  const register = () => {
+  // registerを分配し、registryに記録
+  const register = useCallback(() => {
     const id = crypto.randomUUID()
 
     registry.current.set(id, {})
@@ -88,7 +92,7 @@ export const PsdCharacter = ({
       getter,
       unregister,
     }
-  }
+  }, [])
 
 
   return (
@@ -249,11 +253,11 @@ const BlockRuntime = ({
   const curRegistry = useRef(new Map<string, PsdOptions>())
   const order = useRef<string[]>([])
 
-  const [options, setOptions] = useState<PsdOptions>({})
+  const options = useRef<PsdOptions>({})
 
   const recompute = useCallback(() => {
     const merged = Object.assign({}, ...curRegistry.current.values())
-    setOptions(merged)
+    options.current = merged
   }, [])
 
   const curRegister = useCallback(() => {
@@ -290,9 +294,10 @@ const BlockRuntime = ({
     }
   }, [])
 
+  const frame = useCurrentFrame()
   useEffect(() => {
-    update(options)
-  }, [options])
+    update(options.current)
+  }, [frame])
 
 
   return (
@@ -354,7 +359,7 @@ const DeclareAnimationRuntime = ({
     ast.f(ctx, initializingVariables)
   }, [])
 
-  const curVariables = Object.assign(variables, initializingVariables)
+  const curVariables = {...variables, ...initializingVariables}
 
   const reg = useRef(register())
   const {update, getter: superGetter, unregister} = reg.current
@@ -366,11 +371,11 @@ const DeclareAnimationRuntime = ({
   const curRegistry = useRef(new Map<string, PsdOptions>())
   const order = useRef<string[]>([])
 
-  const [options, setOptions] = useState<PsdOptions>({})
+  const options = useRef<PsdOptions>({})
 
   const recompute = useCallback(() => {
     const merged = Object.assign({}, ...curRegistry.current.values())
-    setOptions(merged)
+    options.current = merged
   }, [])
 
   const curRegister = useCallback(() => {
@@ -407,9 +412,10 @@ const DeclareAnimationRuntime = ({
     }
   }, [])
 
+  const frame = useCurrentFrame()
   useEffect(() => {
     update(options)
-  }, [options])
+  }, [frame])
 
   return (
     <>
