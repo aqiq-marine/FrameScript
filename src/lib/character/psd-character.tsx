@@ -455,7 +455,21 @@ const VoiceRuntime = ({
   variables,
   register
 }: VoiceRuntimeProps) => {
-  return <Sound sound={ast.voice} />
+  const local_frame = useCurrentFrame()
+  const global_frame = useGlobalCurrentFrame()
+  const frames = [local_frame, global_frame]
+
+  const volume =
+    typeof ast.volume === "function"
+      ? ast.volume(variables, frames)
+      : ast.volume
+
+  return (
+    <Sound
+      sound={ast.voice}
+      volume={volume}
+    />
+  )
 }
 
 type MotionRuntimeProps = {

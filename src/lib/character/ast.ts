@@ -76,6 +76,7 @@ export interface DeclareAnimationNode {
 export interface VoiceNode {
   type: typeof PsdCharacterElement.Voice
   voice: string
+  volume: undefined | number | ((variables: Record<string, Variable<any>>, frames: number[]) => number)
   children: VoiceChild[]
 }
 

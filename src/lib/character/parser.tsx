@@ -257,11 +257,12 @@ function parseDeclareAnimationChildren(
 function parseVoice(
   self: AnyElement,
 ): VoiceNode {
-  const { voice, children } = self.props
+  const { voice, volume, children } = self.props
   const body = parseVoiceChildren(children)
   return {
       type: PsdElm.Voice,
       voice,
+      volume: volume ?? undefined,
       children: body,
   }
 }
