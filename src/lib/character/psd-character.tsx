@@ -11,6 +11,7 @@ import { Clip, ClipSequence } from "../clip"
 
 type PsdCharacterProps = {
   psd: string
+  className?: string
   children: React.ReactNode
 }
 
@@ -28,6 +29,7 @@ type OptionRegister = () => {
 
 export const PsdCharacter = ({
   psd,
+  className,
   children
 }: PsdCharacterProps) => {
   const [myPsd, setPsd] = useState<Psd | undefined>(undefined)
@@ -98,7 +100,7 @@ export const PsdCharacter = ({
 
   return (
     <>
-      <canvas ref={canvas} />
+      <canvas className={className} ref={canvas} />
       {ast?.children.map((child, i) => {
         switch (child.type) {
           case PsdElm.MotionSequence:
