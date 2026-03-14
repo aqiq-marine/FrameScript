@@ -10,10 +10,11 @@ export const DeclareCharacters = defineDSL<{
 }>(CharacterManagerElement.DeclareCharacters)
 
 export const Senario = defineDSL<{
-  children: ChildrenOf<typeof Chapter>
+  children?: ChildrenOf<typeof Chapter>
 }>(CharacterManagerElement.Senario)
 
 export const DeclareCharacter = defineDSL<{
+  className?: string
   name: string
   psd: string
   children: React.ReactNode
@@ -24,6 +25,7 @@ export const Chapter = defineDSL<{
 }>(CharacterManagerElement.Chapter)
 
 export const Speaker = defineDSL<{
+  className?: string
   name: string
   children: React.ReactNode
 }>(CharacterManagerElement.Speaker)

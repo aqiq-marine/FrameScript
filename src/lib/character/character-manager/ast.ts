@@ -35,7 +35,7 @@ export interface SenarioNode {
 
 export interface DeclareCharacterNode {
   type: typeof CharacterManagerElement.DeclareCharacter
-  className: string
+  className?: string
   name: string
   psd: string
   children: ReactNode
@@ -48,7 +48,7 @@ export interface ChapterNode {
 
 export interface SpeakerNode {
   type: typeof CharacterManagerElement.Speaker
-  className: string
+  className?: string
   name: string
   children: ReactNode
 }

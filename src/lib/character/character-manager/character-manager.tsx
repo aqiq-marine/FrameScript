@@ -19,6 +19,7 @@ export const DialogueSenario = ({
       name: character.name,
       psd: character.psd,
       waitingState: <PsdCharacter
+        key={character.name}
         className={character.className}
         psd={character.psd}
       >
@@ -36,7 +37,7 @@ export const DialogueSenario = ({
         const speaker = speakerMap.get(character.name)
         if (speaker) {
           return (
-            <PsdCharacter className={speaker.className} psd={character.psd}>
+            <PsdCharacter key={speaker.name} className={speaker.className} psd={character.psd}>
               {speaker.children}
             </PsdCharacter>
           )
