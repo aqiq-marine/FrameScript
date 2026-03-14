@@ -1,4 +1,4 @@
-import type { CharacterChild } from "../character-unit/ast"
+import type { ReactNode } from "react"
 
 export const CharacterManagerElement = {
   CharacterManager: "CharacterManager",
@@ -9,22 +9,8 @@ export const CharacterManagerElement = {
   Speaker: "Speaker",
 } as const
 
-export type CharacterManagerChild =
-  | DeclareCharactersNode
-  | SenarioNode
-
-export type DeclareCharactersChild =
-  | DeclareCharacterNode
-
-export type SenarioChild =
-  | ChapterNode
-
-export type DeclareCharaterChild = CharacterChild
-
 export type ChapterChild = 
   | SpeakerNode
-
-export type SpeakerChild = CharacterChild
 
 
 /* =========================
@@ -33,24 +19,26 @@ export type SpeakerChild = CharacterChild
 
 export interface CharacterManagerNode {
   type: typeof CharacterManagerElement.CharacterManager
-  children: CharacterManagerChild[]
+  characters: DeclareCharactersNode
+  senario: SenarioNode
 }
 
 export interface DeclareCharactersNode {
   type: typeof CharacterManagerElement.DeclareCharacters
-  children: DeclareCharactersChild[]
+  children: DeclareCharacterNode[]
 }
 
 export interface SenarioNode {
   type: typeof CharacterManagerElement.Senario
-  children: SenarioChild[]
+  children: ChapterNode[]
 }
 
 export interface DeclareCharacterNode {
   type: typeof CharacterManagerElement.DeclareCharacter
+  className: string
   name: string
   psd: string
-  children: DeclareCharaterChild[]
+  children: ReactNode
 }
 
 export interface ChapterNode {
@@ -60,6 +48,7 @@ export interface ChapterNode {
 
 export interface SpeakerNode {
   type: typeof CharacterManagerElement.Speaker
+  className: string
   name: string
-  children: SpeakerChild[]
+  children: ReactNode
 }
