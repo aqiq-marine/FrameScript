@@ -54,7 +54,7 @@ export const PsdCharacter = ({
     if (typeof myPsd !== "undefined" && canvas.current) {
       renderPsd(myPsd, options.current, { canvas: canvas.current })
     }
-  }, [frame])
+  }, [frame, myPsd])
 
   // registryをmergeしてoptionsを変更
   const recompute = useCallback(() => {
