@@ -10,7 +10,8 @@ export const CharacterManagerElement = {
 } as const
 
 export type ChapterChild = 
-  | SpeakerNode
+  | { kind: "speaker", node: SpeakerNode }
+  | { kind: "other", node: ReactNode }
 
 
 /* =========================

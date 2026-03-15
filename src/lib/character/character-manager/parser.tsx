@@ -1,5 +1,5 @@
 import React, { isValidElement, type ReactElement, type ReactNode } from "react"
-import type { CharacterManagerNode,  DeclareCharactersNode,  SenarioNode,  DeclareCharacterNode,  ChapterNode,  SpeakerNode } from "./ast"
+import type { CharacterManagerNode,  DeclareCharactersNode,  SenarioNode,  DeclareCharacterNode,  ChapterNode,  SpeakerNode, ChapterChild } from "./ast"
 import { CharacterManagerElement as ManagerElm} from "./ast"
 
 
@@ -108,15 +108,15 @@ const parseChapter = (
 
 const parseChapterChildren = (
   children: ReactNode 
-): SpeakerNode[] => {
-  return React.Children.map(children, (child) => {
+): ChapterChild[] => {
+  return React.Children.map(children, child => {
     if (!isValidElement(child)) return
 
     const type = getDslType(child)
     if (type == ManagerElm.Speaker) {
-      return parseSpeaker(child)
+      return { kind: "speaker", node: parseSpeaker(child) }
     } else {
-      throw `Invalid DSL type in ${ManagerElm.Chapter}: ${type}`
+      return { kind: "other", node: child }
     }
   }) ?? []
 
