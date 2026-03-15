@@ -24,7 +24,7 @@ export type EyeBool = {
   Default: string
 } & Record<EyeShape, string>
 
-type MouthShape = "a" | "i" | "u" | "e" | "o" | "x"
+type MouthShape = "A" | "I" | "U" | "E" | "O" | "X"
 
 export type MouthEnum = {
   Mouth: string
@@ -90,25 +90,25 @@ export const createLipSync = (mouthOptions: MouthOptions) => {
 const lipSyncValueToMouthShape = (value: string): MouthShape => {
   switch (value) {
     case "A":
-      return "a"
+      return "A"
     case "B":
-      return "i"
+      return "I"
     case "C":
-      return "e"
+      return "E"
     case "D":
-      return "a"
+      return "A"
     case "E":
-      return "o"
+      return "O"
     case "F":
-      return "u"
+      return "U"
     case "G":
-      return "i"
+      return "I"
     case "H":
-      return "u"
+      return "U"
     case "X":
-      return "x"
+      return "X"
     default:
-      return "x"
+      return "X"
   }
 }
 

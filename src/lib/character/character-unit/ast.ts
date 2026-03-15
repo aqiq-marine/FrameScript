@@ -2,13 +2,13 @@ import type { Variable } from "../../animation"
 import type { Trim } from "../../trim"
 
 export const PsdCharacterElement = {
-    Character: "Character",
-    MotionSequence: "MotionSequence",
-    DeclareVariable: "DeclareVariable",
-    Block: "Block",
-    DeclareAnimation: "DeclareAnimation",
-    Voice: "Voice",
-    Motion: "Motion",
+  Character: "Character",
+  MotionSequence: "MotionSequence",
+  DeclareVariable: "DeclareVariable",
+  Block: "Block",
+  DeclareAnimation: "DeclareAnimation",
+  Voice: "Voice",
+  Motion: "Motion",
 } as const
 
 

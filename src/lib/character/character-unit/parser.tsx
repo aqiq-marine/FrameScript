@@ -5,19 +5,19 @@ import { PsdCharacterElement as PsdElm } from "./ast"
 type AnyElement = ReactElement<any, any>
 
 
-export function parsePsdCharacter(
+export const parsePsdCharacter = (
   children: ReactNode,
-): CharacterNode {
-    const body = parsePsdCharacterChildren(children)
-    return {
-        type: PsdElm.Character,
-        children: body,
-    }
+): CharacterNode => {
+  const body = parsePsdCharacterChildren(children)
+  return {
+    type: PsdElm.Character,
+    children: body,
+  }
 }
 
-function parsePsdCharacterChildren(
+const parsePsdCharacterChildren = (
   children: ReactNode,
-): CharacterChild[] {
+): CharacterChild[] => {
   const result: CharacterChild[] = []
 
   React.Children.forEach(children, (child) => {
@@ -54,20 +54,20 @@ function parsePsdCharacterChildren(
   return result
 }
 
-function parseMotionSequence(
+const parseMotionSequence = (
   self: AnyElement,
-): MotionSequenceNode {
+): MotionSequenceNode => {
   const { children } = self.props
   const body = parseMotionSequenceChildren(children)
   return {
-      type: PsdElm.MotionSequence,
-      children: body,
+    type: PsdElm.MotionSequence,
+    children: body,
   }
 }
 
-function parseMotionSequenceChildren(
+const parseMotionSequenceChildren = (
   children: ReactNode,
-): MotionSequenceChild[] {
+): MotionSequenceChild[] => {
   const result: MotionSequenceChild[] = []
 
   React.Children.forEach(children, (child) => {
@@ -104,9 +104,9 @@ function parseMotionSequenceChildren(
   return result
 }
 
-function parseDeclareVariable(
+const parseDeclareVariable = (
   self: AnyElement,
-): DeclareVariableNode {
+): DeclareVariableNode => {
   const { variableName, initValue, children } = self.props
   const body = parseDeclareVariableChild(children)
 
@@ -119,16 +119,16 @@ function parseDeclareVariable(
 }
 
 
-function parseDeclareVariableChild(
+const parseDeclareVariableChild = (
   children: ReactNode,
-): DeclareVariableChild {
+): DeclareVariableChild => {
 
   const single = React.Children.toArray(children)
   if (single.length == 1) {
     const child = single[0]
 
     if (!isValidElement(child)) {
-        throw new Error(`Invalid Element in ${PsdElm.DeclareVariable}`)
+      throw new Error(`Invalid Element in ${PsdElm.DeclareVariable}`)
     }
 
     const type = getDslType(child)
@@ -153,20 +153,20 @@ function parseDeclareVariableChild(
   }
 }
 
-function parseBlock(
+const parseBlock = (
   self: AnyElement,
-): BlockNode {
+): BlockNode => {
   const { children } = self.props
   const body = parseBlockChildren(children)
   return {
-      type: PsdElm.Block,
-      children: body,
+    type: PsdElm.Block,
+    children: body,
   }
 }
 
-function parseBlockChildren(
+const parseBlockChildren = (
   children: ReactNode,
-): BlockChild[] {
+): BlockChild[] => {
   const result: BlockChild[] = []
 
   React.Children.forEach(children, (child) => {
@@ -203,21 +203,21 @@ function parseBlockChildren(
   return result
 }
 
-function parseDeclareAnimation(
+const parseDeclareAnimation = (
   self: AnyElement,
-): DeclareAnimationNode {
+): DeclareAnimationNode => {
   const { f, children } = self.props
   const body = parseDeclareAnimationChildren(children)
   return {
-      type: PsdElm.DeclareAnimation,
-      f,
-      children: body,
+    type: PsdElm.DeclareAnimation,
+    f,
+    children: body,
   }
 }
 
-function parseDeclareAnimationChildren(
+const parseDeclareAnimationChildren = (
   children: ReactNode,
-): DeclareAnimationChild[] {
+): DeclareAnimationChild[] => {
   const result: DeclareAnimationChild[] = []
 
   React.Children.forEach(children, (child) => {
@@ -254,26 +254,26 @@ function parseDeclareAnimationChildren(
   return result
 }
 
-function parseVoice(
+const parseVoice = (
   self: AnyElement,
-): VoiceNode {
+): VoiceNode => {
   const { voice, trim, fadeInFrames, fadeOutFrames, volume, showWaveform, children } = self.props
   const body = parseVoiceChildren(children)
   return {
-      type: PsdElm.Voice,
-      voice,
-      trim,
-      fadeInFrames,
-      fadeOutFrames,
-      volume: volume ?? undefined,
-      showWaveform,
-      children: body,
+    type: PsdElm.Voice,
+    voice,
+    trim,
+    fadeInFrames,
+    fadeOutFrames,
+    volume: volume ?? undefined,
+    showWaveform,
+    children: body,
   }
 }
 
-function parseVoiceChildren(
+const parseVoiceChildren = (
   children: ReactNode,
-): VoiceChild[] {
+): VoiceChild[] => {
   const result: VoiceChild[] = []
 
   React.Children.forEach(children, (child) => {
@@ -299,18 +299,18 @@ function parseVoiceChildren(
   return result
 }
 
-function parseMotion(
+const parseMotion = (
   self: AnyElement,
-): MotionNode {
+): MotionNode => {
   const { motion } = self.props
   return {
-      type: PsdElm.Motion,
-      motion
+    type: PsdElm.Motion,
+    motion
   }
 }
 
 
-function getDslType(el: AnyElement): string | undefined {
+const getDslType = (el: AnyElement): string | undefined => {
   const type = el.type as any
 
   if (type?.__dslType) {

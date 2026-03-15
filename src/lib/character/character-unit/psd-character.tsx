@@ -21,9 +21,9 @@ type PsdPath = {
 
 type PsdOptions = Record<string, any>
 type OptionRegister = () => {
-    update: (opt: Record<string, any>) => void
-    getter: () => Record<string, any>
-    unregister: () => void
+  update: (opt: Record<string, any>) => void
+  getter: () => Record<string, any>
+  unregister: () => void
 }
 
 
@@ -153,12 +153,12 @@ const MotionSequenceRuntime = ({
 }: MotionSequenceRuntimeProps) => {
   const reg = useRef<ReturnType<OptionRegister>>(undefined)
   if (!reg.current) {
-      reg.current = register()
+    reg.current = register()
   }
   const {update, getter, unregister} = reg.current
 
   useEffect(() => {
-      return () => unregister()
+    return () => unregister()
   }, [])
 
   // 直列のため同じregisterを使う
@@ -252,7 +252,7 @@ const BlockRuntime = ({
 }: BlockRuntimeProps) => {
   const reg = useRef<ReturnType<OptionRegister>>(undefined)
   if (!reg.current) {
-      reg.current = register()
+    reg.current = register()
   }
   const {update, getter: superGetter, unregister} = reg.current
 
@@ -373,7 +373,7 @@ const DeclareAnimationRuntime = ({
 
   const reg = useRef<ReturnType<OptionRegister>>(undefined)
   if (!reg.current) {
-      reg.current = register()
+    reg.current = register()
   }
   const {update, getter: superGetter, unregister} = reg.current
 
