@@ -1,5 +1,5 @@
 import type { ReactNode } from "react"
-import type { Variable } from "../../animation"
+import type { Variable, AnimationContext } from "../../animation"
 import type { Trim } from "../../trim"
 import { defineDSL } from "../utils/defineDSL"
 import { PsdCharacterElement } from "./ast"
@@ -27,7 +27,7 @@ export const Block = defineDSL<{
 
 // 宣言されたVariableをアニメーションとして登録する
 type DeclareAnimationProps<T extends string> = {
-  f: (ctx: any, variable: Record<T, Variable<any>>) => Promise<void>
+  f: (ctx: AnimationContext, variable: Record<T, Variable<any>>) => Promise<void>
   children: React.ReactNode
 }
 export const DeclareAnimation = <T extends string = string>(_: DeclareAnimationProps<T>) => null
@@ -59,7 +59,7 @@ type Entries<T> = [keyof T, T[keyof T]][];
 
 type DeclareVariablesProps<T extends string> = {
   variables: Record<T, any>
-  animation: (ctx: any, variable: Record<T, Variable<any>>) => Promise<void>
+  animation: (ctx: AnimationContext, variable: Record<T, Variable<any>>) => Promise<void>
   children: ReactNode
 }
 
@@ -81,7 +81,7 @@ export const DeclareVariables = <T extends string = string>(props: DeclareVariab
 
 type MotionWithVarsProps<S extends string, T extends string> = {
   variables: Record<T, any>
-  animation: (ctx: any, variable: Record<T, Variable<any>>) => Promise<void>
+  animation: (ctx: AnimationContext, variable: Record<T, Variable<any>>) => Promise<void>
   motion: (variables: Record<S | T, Variable<any>>, frames: number[]) => Record<string, any>
 }
 

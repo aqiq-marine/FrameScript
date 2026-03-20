@@ -1,4 +1,4 @@
-import type { Variable } from "../../animation"
+import type { AnimationContext, Variable } from "../../animation"
 import type { Trim } from "../../trim"
 
 export const PsdCharacterElement = {
@@ -70,7 +70,7 @@ export interface BlockNode {
 
 export interface DeclareAnimationNode {
   type: typeof PsdCharacterElement.DeclareAnimation
-  f: (ctx: any, variable: Record<string, Variable<any>>) => Promise<void>
+  f: (ctx: AnimationContext, variable: Record<string, Variable<any>>) => Promise<void>
   children: DeclareAnimationChild[]
 }
 
