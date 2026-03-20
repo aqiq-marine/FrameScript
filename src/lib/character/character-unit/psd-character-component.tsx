@@ -1,3 +1,4 @@
+import type { ReactNode } from "react"
 import type { Variable } from "../../animation"
 import type { Trim } from "../../trim"
 import { defineDSL } from "../utils/defineDSL"
@@ -54,13 +55,36 @@ Motion.__dslType = PsdCharacterElement.Motion
 
 // complex components ------------------------
 
+type Entries<T> = [keyof T, T[keyof T]][];
+
+type DeclareVariablesProps<T extends string> = {
+  variables: Record<T, any>
+  animation: (ctx: any, variable: Record<T, Variable<any>>) => Promise<void>
+  children: ReactNode
+}
+
+export const DeclareVariables = <T extends string = string>(props: DeclareVariablesProps<T>) => {
+  let result =
+    <DeclareAnimation f={props.animation}>
+        {props.children}
+    </DeclareAnimation>
+
+  for (const [key, value] of Object.entries(props.variables).reverse() as Entries<typeof props.variables>) {
+    result =
+      <DeclareVariable variableName={key} initValue={value}>
+        {result}
+      </DeclareVariable>
+  }
+
+  return result
+}
+
 type MotionWithVarsProps<S extends string, T extends string> = {
   variables: Record<T, any>
   animation: (ctx: any, variable: Record<T, Variable<any>>) => Promise<void>
   motion: (variables: Record<S | T, Variable<any>>, frames: number[]) => Record<string, any>
 }
 
-type Entries<T> = [keyof T, T[keyof T]][];
 
 export const MotionWithVars = <S extends string = never, T extends string = string>(props: MotionWithVarsProps<S, T>) => {
   let result =
