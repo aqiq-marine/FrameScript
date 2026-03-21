@@ -1,5 +1,5 @@
 import React, { isValidElement, type ReactElement, type ReactNode } from "react"
-import type { BlockChild, BlockNode, CharacterChild, CharacterNode, DeclareAnimationChild, DeclareAnimationNode, DeclareVariableChild, DeclareVariableNode, MotionNode, MotionSequenceChild, MotionSequenceNode, VoiceChild, VoiceNode } from "./ast"
+import type { MotionClipChild, MotionClipNode, CharacterChild, CharacterNode, DeclareAnimationChild, DeclareAnimationNode, DeclareVariableChild, DeclareVariableNode, MotionNode, MotionSequenceChild, MotionSequenceNode, VoiceChild, VoiceNode } from "./ast"
 import { PsdCharacterElement as PsdElm } from "./ast"
 
 type AnyElement = ReactElement<any, any>
@@ -76,8 +76,8 @@ const parseMotionSequenceChildren = (
     const type = getDslType(child)
 
     switch (type) {
-      case PsdElm.Block:
-        result.push(parseBlock(child))
+      case PsdElm.MotionClip:
+        result.push(parseMotionClip(child))
         break
 
       case PsdElm.DeclareVariable:
@@ -153,21 +153,21 @@ const parseDeclareVariableChild = (
   }
 }
 
-const parseBlock = (
+const parseMotionClip = (
   self: AnyElement,
-): BlockNode => {
+): MotionClipNode => {
   const { children } = self.props
-  const body = parseBlockChildren(children)
+  const body = parseMotionClipChildren(children)
   return {
-    type: PsdElm.Block,
+    type: PsdElm.MotionClip,
     children: body,
   }
 }
 
-const parseBlockChildren = (
+const parseMotionClipChildren = (
   children: ReactNode,
-): BlockChild[] => {
-  const result: BlockChild[] = []
+): MotionClipChild[] => {
+  const result: MotionClipChild[] = []
 
   React.Children.forEach(children, (child) => {
     if (!isValidElement(child)) return
@@ -191,12 +191,12 @@ const parseBlockChildren = (
         break
       case "function":
         const expanded = child.type(child.props)
-        const expandedAst = parseBlockChildren(expanded)
+        const expandedAst = parseMotionClipChildren(expanded)
         result.push(...expandedAst)
         break
 
       default:
-        throw new Error(`Invalid DSL type in ${PsdElm.Block}: ${type}`)
+        throw new Error(`Invalid DSL type in ${PsdElm.MotionClip}: ${type}`)
     }
   })
 

@@ -32,9 +32,9 @@ DeclareVariable.__dslType = PsdCharacterElement.DeclareVariable
 /**
  * MotionSequence直下で使用し、子要素を並列化する
  */
-export const Block = defineDSL<{
+export const MotionClip = defineDSL<{
   children: React.ReactNode
-}>(PsdCharacterElement.Block)
+}>(PsdCharacterElement.MotionClip)
 
 type DeclareAnimationProps<T extends string> = {
   animation: (ctx: AnimationContext, variables: Record<T, Variable<VariableType>>) => Promise<void>

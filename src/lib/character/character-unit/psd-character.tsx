@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react"
 
-import { PsdCharacterElement as PsdElm, type BlockNode, type CharacterNode, type DeclareAnimationNode, type DeclareVariableNode, type MotionNode, type MotionSequenceNode, type VoiceNode } from "./ast"
+import { PsdCharacterElement as PsdElm, type MotionClipNode, type CharacterNode, type DeclareAnimationNode, type DeclareVariableNode, type MotionNode, type MotionSequenceNode, type VoiceNode } from "./ast"
 import { readPsd, type Psd } from "ag-psd"
 import { parsePsdCharacter } from "./parser"
 import { renderPsd } from "ag-psd-psdtool"
@@ -184,8 +184,8 @@ const MotionSequenceRuntime = ({
               initializingVariables={{}}
               register={curRegister}
             />
-          case PsdElm.Block:
-            return <BlockRuntime
+          case PsdElm.MotionClip:
+            return <MotionClipRuntime
               ast={child}
               variables={variables}
               register={curRegister}
@@ -223,6 +223,10 @@ const DeclareVariableRuntime = ({
   initializingVariables,
   register
 }: DeclareVariableRuntimeProps) => {
+  // T extends VariableTypeとして
+  // DeclareVariableで受け取る型がTなので
+  // ast.initValue: T
+  // であり、これを使う限り問題ない
   const variable = useVariable(ast.initValue)
   const newInitVariables = {[ast.variableName]: variable, ...initializingVariables}
 
@@ -246,17 +250,17 @@ const DeclareVariableRuntime = ({
   }
 }
 
-type BlockRuntimeProps = {
-  ast: BlockNode
+type MotionClipRuntimeProps = {
+  ast: MotionClipNode
   variables: Record<string, Variable<any>>
   register: OptionRegister
 }
 
-const BlockRuntime = ({
+const MotionClipRuntime = ({
   ast,
   variables,
   register
-}: BlockRuntimeProps) => {
+}: MotionClipRuntimeProps) => {
   const reg = useRef<ReturnType<OptionRegister>>(undefined)
   if (!reg.current) {
     reg.current = register()

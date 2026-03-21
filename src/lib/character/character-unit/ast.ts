@@ -5,7 +5,7 @@ export const PsdCharacterElement = {
   Character: "Character",
   MotionSequence: "MotionSequence",
   DeclareVariable: "DeclareVariable",
-  Block: "Block",
+  MotionClip: "MotionClip",
   DeclareAnimation: "DeclareAnimation",
   Voice: "Voice",
   Motion: "Motion",
@@ -19,7 +19,7 @@ export type CharacterChild =
   | MotionNode
 
 export type MotionSequenceChild =
-  | BlockNode
+  | MotionClipNode
   | DeclareVariableNode
   | VoiceNode
   | MotionNode
@@ -28,7 +28,7 @@ export type DeclareVariableChild =
   | DeclareVariableNode
   | DeclareAnimationNode
 
-export type BlockChild =
+export type MotionClipChild =
   | MotionSequenceNode
   | DeclareVariableNode
   | VoiceNode
@@ -63,9 +63,9 @@ export interface DeclareVariableNode {
   children: DeclareVariableChild
 }
 
-export interface BlockNode {
-  type: typeof PsdCharacterElement.Block
-  children: BlockChild[]
+export interface MotionClipNode {
+  type: typeof PsdCharacterElement.MotionClip
+  children: MotionClipChild[]
 }
 
 export interface DeclareAnimationNode {
