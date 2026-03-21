@@ -12,6 +12,13 @@ type DialogueSenarioProps = {
   children: OneOrMany<ReactElement<typeof DeclareCharacters> | ReactElement<typeof Senario>>
 }
 
+/**
+ * 対話的に進行するシナリオを書く
+ * @param implicitPlacement 非話者時のキャラクターをどこに配置するか
+ * @param children 専用コンポーネントを配置し、シナリオを書く。
+ * DeclareCharactersで使用するキャラクターを定義する。
+ * SenarioでChapterごとにキャラクターを配置する。
+ */
 export const DialogueSenario = ({
   implicitPlacement = "back",
   children
@@ -23,9 +30,10 @@ export const DialogueSenario = ({
       character.name,
       {
         psd: character.psd,
-        waitingState: <PsdCharacter
+        speakingClassName: character.speakingClassName,
+        idleState: <PsdCharacter
           key={character.name}
-          className={character.className}
+          className={character.idleClassName}
           psd={character.psd}
         >
           {character.children}
@@ -40,8 +48,12 @@ export const DialogueSenario = ({
 
     const explicits = chapter.children.map(elm => {
       if (elm.kind == "speaker") {
+        let defaultClass = ""
+        if (characters.get(elm.node.name)?.speakingClassName) {
+            defaultClass = " " + characters.get(elm.node.name)!.speakingClassName
+        }
         return (
-          <PsdCharacter key={elm.node.name} className={elm.node.className} psd={characters.get(elm.node.name)?.psd!}>
+          <PsdCharacter key={elm.node.name} className={elm.node.className + defaultClass} psd={characters.get(elm.node.name)?.psd!}>
             {elm.node.children}
           </PsdCharacter>
         )
@@ -49,7 +61,7 @@ export const DialogueSenario = ({
         return elm.node
       }
     })
-    const implicits = implicitCharacters.map(([_, character]) => character.waitingState)
+    const implicits = implicitCharacters.map(([_, character]) => character.idleState)
 
     const merged = mergeImplicitCharacters(implicitPlacement, explicits, implicits)
 

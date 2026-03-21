@@ -13,23 +13,44 @@ export type MouthOptions = { kind: "enum"; options: MouthEnum } | { kind: "bool"
 
 type EyeShape = "Open" | "HalfOpen" | "HalfClosed" | "Closed"
 
+/**
+ * 目パチに関するag-psd-psdtoolに渡す名前を登録する
+ * @property Eye 目の階層までのパス
+ * @property Default デフォルトのオプション
+ */
 export type EyeEnum = {
-  // enum本体
   Eye: string
   Default: string
 } & Record<EyeShape, string>
 
+/**
+ * 目パチに関するag-psd-psdtoolに渡す名前を登録する
+ * Enumになっていないpsdをそのまま利用する用
+ * @property Default デフォルトのオプション
+ */
 export type EyeBool = {
   Default: string
 } & Record<EyeShape, string>
 
 type MouthShape = "A" | "I" | "U" | "E" | "O" | "X"
 
+/**
+ * あいうえお口パクに関するag-psd-psdtoolに渡す名前を登録する
+ * @property Mouth 口の階層までのパス
+ * @property Default デフォルトのオプション
+ * @property X 無声時の口を閉じる形のオプション
+ */
 export type MouthEnum = {
   Mouth: string
   Default: string
 } & Record<MouthShape, string>
 
+/**
+ * あいうえお口パクに関するag-psd-psdtoolに渡す名前を登録する
+ * enumになっていないものをそのまま利用する用
+ * @property Default デフォルトのオプション
+ * @property X 無声時の口を閉じる形のオプション
+ */
 export type MouthBool = {
   Default: string
 } & Record<MouthShape, string>
@@ -47,7 +68,34 @@ export type LipSyncProps = {
   data: LipSyncData
 }
 
-// psdに対応する辞書を用いてあいうえお口パクするコンポーネントを返す
+/**
+ * Psdに対応した口パク用のコンポーネントを返す。
+ * @example
+ * const LipSync = createLipSync({
+ *   kind: "enum" as const,
+ *   options: {
+ *     Mouth: "目・口/口", 
+ *     Default: "あ",
+ *     A: "あ", 
+ *     I: "い", 
+ *     U: "う", 
+ *     E: "え", 
+ *     O: "お", 
+ *     X: "閉じ", 
+ *   }
+ * })
+ *
+ * const data = {
+ *   mouthCues: [{start: 0}, {end: 1}, {value: "A"}]
+ * }
+ * 
+ * // 略 --------------------
+ *
+ * <PsdCharacter psd={psd}>
+ *   <Voice voice={voice}/>
+ *   <LipSync data={data}/>
+ * </PsdCharacter>
+ */
 export const createLipSync = (mouthOptions: MouthOptions) => {
   return ({ data }: LipSyncProps) => {
     return <Motion motion={(_v, frames) => {
@@ -119,7 +167,40 @@ export type BlinkProps = {
   data: BlinkData
 }
 
-// psdに対応する辞書を用いて目パチするコンポーネントを返す
+/**
+ * Psdに対応した目パチ用のコンポーネントを返す。
+ * @example
+ * const Blink = createBlink({
+ *   kind: "enum" as const,
+ *   options: {
+ *     Eye: "目・口/目", 
+ *     Default: "デフォルト"
+ *     Open: "デフォルト",
+ *     HalfOpen: "やや閉じ",
+ *     HalfClosed: "半目",
+ *     Closed: "閉じ"
+ *   }
+ * })
+ *
+ * const data = {
+ *   blinkCues: [
+ *     { start: 0.00, end: 0.40, value: "A" },
+ *     { start: 0.40, end: 0.45, value: "B" },
+ *     { start: 0.45, end: 0.50, value: "C" },
+ *     { start: 0.50, end: 0.55, value: "D" },
+ *     { start: 0.55, end: 0.60, value: "C" },
+ *     { start: 0.60, end: 0.65, value: "B" },
+ *     { start: 0.65, end: 6.65, value: "A" }
+ *   ]
+ * }
+ * 
+ * // 略 --------------------
+ *
+ * <PsdCharacter psd={psd}>
+ *   <Voice voice={voice}/>
+ *   <Blink data={data}/>
+ * </PsdCharacter>
+ */
 export const createBlink = (eyeOptions: EyeOptions) => {
   return ({ data }: BlinkProps) => {
     return <Motion motion={(_v, frames) => {

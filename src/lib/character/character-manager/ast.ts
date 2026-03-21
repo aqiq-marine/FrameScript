@@ -36,7 +36,8 @@ export interface SenarioNode {
 
 export interface DeclareCharacterNode {
   type: typeof CharacterManagerElement.DeclareCharacter
-  className?: string
+  idleClassName?: string
+  speakingClassName?: string
   name: string
   psd: string
   children: ReactNode

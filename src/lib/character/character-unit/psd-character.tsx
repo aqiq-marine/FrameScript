@@ -27,6 +27,13 @@ type OptionRegister = () => {
 }
 
 
+/**
+ * 音声と同期したPsdを利用するアニメーションを作成する。
+ * canvas上にpsdを表示する。
+ * @param psd 利用するpsdのパス
+ * @param className 返すcanvasに登録するclassName
+ * @param children 専用コンポーネントを配置し、アニメーションを作成する。内部でフックは使えない。
+ */
 export const PsdCharacter = ({
   psd,
   className,

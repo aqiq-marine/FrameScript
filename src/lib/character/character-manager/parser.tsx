@@ -85,12 +85,13 @@ const parseSenarioChildren = (
 const parseDeclareCharacter = (
   self: AnyElement
 ): DeclareCharacterNode => {
-  const { name, psd, className, children } = self.props
+  const { name, psd, idleClassName, speakingClassName, children } = self.props
   return {
     type: ManagerElm.DeclareCharacter,
     name,
     psd,
-    className,
+    idleClassName,
+    speakingClassName,
     children,
   }
 }
