@@ -1,4 +1,4 @@
-import type { AnimationContext, Variable } from "../../animation"
+import type { AnimationContext, Variable, VariableType } from "../../animation"
 import type { Trim } from "../../trim"
 
 export const PsdCharacterElement = {
@@ -59,7 +59,7 @@ export interface MotionSequenceNode {
 export interface DeclareVariableNode {
   type: typeof PsdCharacterElement.DeclareVariable
   variableName: string
-  initValue: any
+  initValue: VariableType
   children: DeclareVariableChild
 }
 
@@ -70,7 +70,7 @@ export interface BlockNode {
 
 export interface DeclareAnimationNode {
   type: typeof PsdCharacterElement.DeclareAnimation
-  f: (ctx: AnimationContext, variable: Record<string, Variable<any>>) => Promise<void>
+  f: (ctx: AnimationContext, variable: Record<string, Variable<VariableType>>) => Promise<void>
   children: DeclareAnimationChild[]
 }
 
@@ -80,13 +80,13 @@ export interface VoiceNode {
   trim?: Trim
   fadeInFrames?: number
   fadeOutFrames?: number
-  volume: undefined | number | ((variables: Record<string, Variable<any>>, frames: number[]) => number)
+  volume: undefined | number | ((variables: Record<string, Variable<VariableType>>, frames: number[]) => number)
   showWaveform?: boolean
   children: VoiceChild[]
 }
 
 export interface MotionNode {
   type: typeof PsdCharacterElement.Motion
-  motion: (variables: Record<string, Variable<any>>, frames: number[]) => Record<string, any>
+  motion: (variables: Record<string, Variable<VariableType>>, frames: number[]) => Record<string, any>
 }
 

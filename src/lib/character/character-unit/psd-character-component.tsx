@@ -1,5 +1,5 @@
 import type { ReactNode } from "react"
-import type { Variable, AnimationContext } from "../../animation"
+import type { Variable, VariableType, AnimationContext } from "../../animation"
 import type { Trim } from "../../trim"
 import { defineDSL } from "../utils/defineDSL"
 import { PsdCharacterElement } from "./ast"
@@ -10,13 +10,13 @@ export const MotionSequence = defineDSL<{
 }>(PsdCharacterElement.MotionSequence)
 
 // Variableを宣言する
-type DeclareVariableProps<T extends string> = {
+type DeclareVariableProps<T extends string, U extends VariableType> = {
   variableName: T
-  initValue: any
+  initValue: U
   children: React.ReactNode
 }
 
-export const DeclareVariable = <T extends string = string>(_: DeclareVariableProps<T>) => null
+export const DeclareVariable = <T extends string = string, U extends VariableType = VariableType>(_: DeclareVariableProps<T, U>) => null
 
 DeclareVariable.__dslType = PsdCharacterElement.DeclareVariable
 
@@ -27,7 +27,7 @@ export const Block = defineDSL<{
 
 // 宣言されたVariableをアニメーションとして登録する
 type DeclareAnimationProps<T extends string> = {
-  f: (ctx: AnimationContext, variable: Record<T, Variable<any>>) => Promise<void>
+  f: (ctx: AnimationContext, variable: Record<T, Variable<VariableType>>) => Promise<void>
   children: React.ReactNode
 }
 export const DeclareAnimation = <T extends string = string>(_: DeclareAnimationProps<T>) => null
@@ -48,7 +48,7 @@ export const Voice = defineDSL<{
 // frames[0]: useCurrentFrame
 // frames[frames.length - 1]: useGlobalCurrentFrame
 type MotionProps<T extends string> = {
-  motion: (variables: Record<T, Variable<any>>, frames: number[]) => Record<string, any>
+  motion: (variables: Record<T, Variable<VariableType>>, frames: number[]) => Record<string, any>
 }
 export const Motion = <T extends string = string>(_: MotionProps<T>) => null
 Motion.__dslType = PsdCharacterElement.Motion
@@ -57,21 +57,43 @@ Motion.__dslType = PsdCharacterElement.Motion
 
 type Entries<T> = [keyof T, T[keyof T]][];
 
-type DeclareVariablesProps<T extends string> = {
-  variables: Record<T, any>
-  animation: (ctx: AnimationContext, variable: Record<T, Variable<any>>) => Promise<void>
+type TypedRecord<T extends Record<string, any>> = {
+  [K in keyof T]: T[K]
+}
+
+type Variables<T extends Record<string, VariableType>> = {
+  [K in keyof T]: Variable<T[K]>
+}
+
+
+function typeVariables<T extends Record<string, VariableType>>(
+  flat: Record<string, Variable<VariableType>>,
+): Variables<T> {
+  const result = {} as Variables<T>
+
+  for (const key of Object.keys(flat) as (keyof T)[]) {
+    result[key] = flat[key as string] as Variable<T[typeof key]>
+  }
+
+  return result
+}
+
+
+type DeclareVariablesProps<T extends Record<string, VariableType>> = {
+  variables: T
+  animation: (ctx: AnimationContext, variable: Variables<T>) => Promise<void>
   children: ReactNode
 }
 
-export const DeclareVariables = <T extends string = string>(props: DeclareVariablesProps<T>) => {
+export const DeclareVariables = <T extends Record<string, VariableType> = any>(props: DeclareVariablesProps<T>) => {
   let result =
-    <DeclareAnimation f={props.animation}>
+    <DeclareAnimation f={(ctx, variables) => props.animation(ctx, typeVariables<T>(variables))}>
         {props.children}
     </DeclareAnimation>
 
   for (const [key, value] of Object.entries(props.variables).reverse() as Entries<typeof props.variables>) {
     result =
-      <DeclareVariable variableName={key} initValue={value}>
+      <DeclareVariable variableName={key as string} initValue={value}>
         {result}
       </DeclareVariable>
   }
@@ -79,22 +101,23 @@ export const DeclareVariables = <T extends string = string>(props: DeclareVariab
   return result
 }
 
-type MotionWithVarsProps<S extends string, T extends string> = {
-  variables: Record<T, any>
-  animation: (ctx: AnimationContext, variable: Record<T, Variable<any>>) => Promise<void>
-  motion: (variables: Record<S | T, Variable<any>>, frames: number[]) => Record<string, any>
+
+type MotionWithVarsProps<S extends Record<string, VariableType>, T extends Record<string, VariableType>> = {
+  variables: TypedRecord<T>
+  animation: (ctx: AnimationContext, variable: Variables<T>) => Promise<void>
+  motion: (variables: Variables<S & T>, frames: number[]) => Record<string, any>
 }
 
 
-export const MotionWithVars = <S extends string = never, T extends string = string>(props: MotionWithVarsProps<S, T>) => {
+export const MotionWithVars = <S extends Record<string, VariableType> = {}, T extends Record<string, VariableType> = Record<string, any>>(props: MotionWithVarsProps<S, T>) => {
   let result =
-    <DeclareAnimation f={props.animation}>
-      <Motion motion={props.motion} />
+    <DeclareAnimation f={(ctx, variables) => props.animation(ctx, typeVariables<T>(variables))}>
+      <Motion motion={(variables, frames) => props.motion(typeVariables<S & T>(variables), frames)} />
     </DeclareAnimation>
 
   for (const [key, value] of Object.entries(props.variables).reverse() as Entries<typeof props.variables>) {
     result =
-      <DeclareVariable variableName={key} initValue={value}>
+      <DeclareVariable variableName={key as string} initValue={value}>
         {result}
       </DeclareVariable>
   }
