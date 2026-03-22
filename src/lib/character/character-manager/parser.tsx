@@ -1,6 +1,7 @@
 import React, { isValidElement, type ReactElement, type ReactNode } from "react"
 import type { CharacterManagerNode,  DeclareCharactersNode,  SenarioNode,  DeclareCharacterNode,  ChapterNode,  SpeakerNode, ChapterChild } from "./ast"
 import { CharacterManagerElement as ManagerElm} from "./ast"
+import { Motion } from "../character-unit"
 
 
 type AnyElement = ReactElement<any, any>
@@ -86,13 +87,17 @@ const parseDeclareCharacter = (
   self: AnyElement
 ): DeclareCharacterNode => {
   const { name, psd, idleClassName, speakingClassName, children } = self.props
+  let comp_child = <Motion motion={(_v, _f) => {return {}}} />
+  if (children) {
+      comp_child = children
+  }
   return {
     type: ManagerElm.DeclareCharacter,
     name,
     psd,
     idleClassName,
     speakingClassName,
-    children,
+    children: comp_child,
   }
 }
 

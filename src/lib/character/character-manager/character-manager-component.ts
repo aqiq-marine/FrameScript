@@ -31,7 +31,7 @@ export const DeclareCharacter = defineDSL<{
   speakingClassName?: string
   name: string
   psd: string
-  children: React.ReactNode
+  children?: React.ReactNode
 }>(CharacterManagerElement.DeclareCharacter)
 
 /**
