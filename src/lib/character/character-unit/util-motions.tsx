@@ -1,38 +1,44 @@
+import { threshold } from "three/examples/jsm/nodes/Nodes.js"
+import { PROJECT_SETTINGS } from "../../../../project/project"
 import { framesToSeconds } from "../../audio"
 import { useCurrentFrame } from "../../frame"
-import { Motion } from "./psd-character-component"
+import { DEFAULT_THRESHOLD, resolveSegmentAmplitude } from "../../sound/character"
+import { Motion, VoiceMotion } from "./psd-character-component"
+import type { Trim } from "../../trim"
 
 
 export type BasicPsdOptions = {
-  eye: EyeOptions
+  eye: EyeOptions4
   mouth: MouthOptions
 }
 
-export type EyeOptions = { kind: "enum"; options: EyeEnum } | { kind: "bool"; options: EyeBool }
-export type MouthOptions = { kind: "enum"; options: MouthEnum } | { kind: "bool"; options: MouthBool }
+export type EyeOptions4 = { kind: "enum"; options: EyeEnum<EyeShape4> } | { kind: "bool"; options: EyeBool<EyeShape4> }
+export type MouthOptions = { kind: "enum"; options: MouthEnum<MouthShapeVowel> } | { kind: "bool"; options: MouthBool<MouthShapeVowel> }
+export type SimpleMouthOptions = { kind: "enum"; options: MouthEnum<MouthShape2> } | { kind: "bool"; options: MouthBool<MouthShape2> }
 
-type EyeShape = "Open" | "HalfOpen" | "HalfClosed" | "Closed"
+type EyeShape4 = "Open" | "HalfOpen" | "HalfClosed" | "Closed"
 
 /**
  * 目パチに関するag-psd-psdtoolに渡す名前を登録する
  * @property Eye 目の階層までのパス
  * @property Default デフォルトのオプション
  */
-export type EyeEnum = {
+export type EyeEnum<T extends string> = {
   Eye: string
   Default: string
-} & Record<EyeShape, string>
+} & Record<T, string>
 
 /**
  * 目パチに関するag-psd-psdtoolに渡す名前を登録する
  * Enumになっていないpsdをそのまま利用する用
  * @property Default デフォルトのオプション
  */
-export type EyeBool = {
+export type EyeBool<T extends string> = {
   Default: string
-} & Record<EyeShape, string>
+} & Record<T, string>
 
-type MouthShape = "A" | "I" | "U" | "E" | "O" | "X"
+type MouthShapeVowel = "A" | "I" | "U" | "E" | "O" | "X"
+type MouthShape2 = "Open" | "Closed"
 
 /**
  * あいうえお口パクに関するag-psd-psdtoolに渡す名前を登録する
@@ -40,10 +46,10 @@ type MouthShape = "A" | "I" | "U" | "E" | "O" | "X"
  * @property Default デフォルトのオプション
  * @property X 無声時の口を閉じる形のオプション
  */
-export type MouthEnum = {
+export type MouthEnum<T extends string> = {
   Mouth: string
   Default: string
-} & Record<MouthShape, string>
+} & Record<T, string>
 
 /**
  * あいうえお口パクに関するag-psd-psdtoolに渡す名前を登録する
@@ -51,9 +57,9 @@ export type MouthEnum = {
  * @property Default デフォルトのオプション
  * @property X 無声時の口を閉じる形のオプション
  */
-export type MouthBool = {
+export type MouthBool<T extends string> = {
   Default: string
-} & Record<MouthShape, string>
+} & Record<T, string>
 
 type HasKey<K extends string, V = unknown> = {
   [P in K]: V
@@ -100,7 +106,7 @@ export const createLipSync = (mouthOptions: MouthOptions) => {
   return ({ data }: LipSyncProps) => {
     return <Motion motion={(_v, frames) => {
       const t = framesToSeconds(frames[0])
-      let shape: MouthShape | undefined = undefined
+      let shape: MouthShapeVowel | undefined = undefined
       for (let section of data.mouthCues) {
         if (section.start <= t && t < section.end) {
           shape = lipSyncValueToMouthShape(section.value)
@@ -112,29 +118,12 @@ export const createLipSync = (mouthOptions: MouthOptions) => {
         return {}
       }
 
-
-      if (mouthOptions.kind === "enum") {
-        return {
-          [mouthOptions.options.Mouth]: mouthOptions.options[shape]
-        }
-      } else if (mouthOptions.options[shape] == mouthOptions.options.Default) {
-        return {
-          [mouthOptions.options.Default]: true
-        }
-      } else {
-        const opt = {
-          [mouthOptions.options.Default]: false,
-          [mouthOptions.options[shape]]: true
-        }
-
-        return opt
-      }
-
+      return applyMouthOption(mouthOptions, shape)
     }} />
   }
 }
 
-const lipSyncValueToMouthShape = (value: string): MouthShape => {
+const lipSyncValueToMouthShape = (value: string): MouthShapeVowel => {
   switch (value) {
     case "A":
       return "A"
@@ -158,6 +147,68 @@ const lipSyncValueToMouthShape = (value: string): MouthShape => {
       return "X"
   }
 }
+
+// simple lipsync --------------
+
+type SimpleLipSyncProps = {
+  voice: string,
+  threshold?: number
+  trim?: Trim
+  fadeInFrames?: number
+  fadeOutFrames?: number
+  volume?: number
+  showWaveform?: boolean
+}
+
+export const createSimpleLipSync = (mouthOptions: SimpleMouthOptions) => {
+  return ({
+    voice,
+    threshold=DEFAULT_THRESHOLD,
+    trim,
+    fadeInFrames,
+    fadeOutFrames,
+    volume,
+    showWaveform
+  }: SimpleLipSyncProps) => {
+    return <VoiceMotion
+      voice={voice}
+      voiceMotion={(audioSegment, waveform, _, frames) => {
+        const amp = resolveSegmentAmplitude(audioSegment, waveform, frames[0], PROJECT_SETTINGS.fps)
+        return amp > threshold ? applyMouthOption(mouthOptions, "Open") : applyMouthOption(mouthOptions, "Closed")
+      }}
+      trim={trim}
+      fadeInFrames={fadeInFrames}
+      fadeOutFrames={fadeOutFrames}
+      volume={volume}
+      showWaveform={showWaveform}
+    />
+  }
+}
+
+function applyMouthOption(mouthOptions: MouthOptions, option: MouthShapeVowel): Record<string, any>;
+function applyMouthOption(mouthOptions: SimpleMouthOptions, option: MouthShape2): Record<string, any>;
+function applyMouthOption(mouthOptions: MouthOptions | SimpleMouthOptions, option: MouthShapeVowel | MouthShape2): Record<string, any> {
+  if (!(option in mouthOptions.options)) return {}
+  const opt = option as keyof typeof mouthOptions.options
+  if (mouthOptions.kind == "enum") {
+    return {
+      [mouthOptions.options.Mouth]: mouthOptions.options[opt]
+    }
+  }
+
+  if (option == mouthOptions.options.Default) {
+    return {
+      [mouthOptions.options.Default]: true
+    }
+  } else {
+    return {
+      [mouthOptions.options.Default]: false,
+      [mouthOptions.options[opt]]: true
+    }
+  }
+
+}
+
 
 // blink --------------------------------
 
@@ -201,7 +252,7 @@ export type BlinkProps = {
  *   <Blink data={data}/>
  * </PsdCharacter>
  */
-export const createBlink = (eyeOptions: EyeOptions) => {
+export const createBlink = (eyeOptions: EyeOptions4) => {
   return ({ data }: BlinkProps) => {
     return <Motion motion={(_v, frames) => {
 
@@ -223,7 +274,7 @@ export const createBlink = (eyeOptions: EyeOptions) => {
         }
       }
       
-      let shape: EyeShape | undefined = undefined
+      let shape: EyeShape4 | undefined = undefined
       if (idx !== -1 && t < sections[idx].end) {
         shape = BlinkValueToEyeShape(sections[idx].value)
       }
@@ -254,7 +305,7 @@ export const createBlink = (eyeOptions: EyeOptions) => {
   }
 }
 
-const BlinkValueToEyeShape = (value: string): EyeShape => {
+const BlinkValueToEyeShape = (value: string): EyeShape4 => {
   switch (value) {
     case "A":
       return "Open"

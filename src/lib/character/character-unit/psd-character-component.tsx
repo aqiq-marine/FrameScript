@@ -5,6 +5,7 @@ import { defineDSL } from "../utils/defineDSL"
 import { PsdCharacterElement } from "./ast"
 import type { AudioSegment } from "../../audio-plan"
 import type { WaveformData } from "../../audio-waveform"
+import type { Entries, TypedRecord, Variables } from "../utils/util-types"
 
 /**
  * 子要素を直列化する。
@@ -54,6 +55,7 @@ DeclareAnimation.__dslType = PsdCharacterElement.DeclareAnimation
 /**
  * 音声を配置する（ファイルのみ）。voice以外はSoundと同様
  * @param voice 音声ファイル
+ * @param voiceMotion 音声を利用したアニメーションをつける関数
  */
 export const Voice = defineDSL<{
   voice: string
@@ -63,7 +65,6 @@ export const Voice = defineDSL<{
   fadeOutFrames?: number
   volume?: number
   showWaveform?: boolean
-  children?: React.ReactNode
 }>(PsdCharacterElement.Voice)
 
 type MotionProps<T extends string> = {
@@ -83,17 +84,6 @@ export const Motion = <T extends string = string>(_: MotionProps<T>) => null
 Motion.__dslType = PsdCharacterElement.Motion
 
 // complex components ------------------------
-
-type Entries<T> = [keyof T, T[keyof T]][];
-
-type TypedRecord<T extends Record<string, any>> = {
-  [K in keyof T]: T[K]
-}
-
-type Variables<T extends Record<string, VariableType>> = {
-  [K in keyof T]: Variable<T[K]>
-}
-
 
 const typeVariables = <T extends Record<string, VariableType>>(
   flat: Record<string, Variable<VariableType>>,
@@ -142,6 +132,36 @@ type MotionWithVarsProps<S extends Record<string, VariableType>, T extends Recor
   variables: TypedRecord<T>
   animation: (ctx: AnimationContext, variable: Variables<T>) => Promise<void>
   motion: (variables: Variables<S & T>, frames: number[]) => Record<string, any>
+}
+
+type VoiceMotionProps<T extends Record<string, VariableType>> = {
+  voice: string
+  voiceMotion: (segment: AudioSegment, waveform: WaveformData, variables: Variables<T>, frames: number[]) => Record<string, any>
+  trim?: Trim
+  fadeInFrames?: number
+  fadeOutFrames?: number
+  volume?: number
+  showWaveform?: boolean
+}
+
+/**
+ * 音声を利用したアニメーションを行う
+ * VoiceのvoiceMotionと同様だがvariablesに型をつけられる
+ * @template T 宣言する変数の型
+ */
+export const VoiceMotion = <T extends Record<string, VariableType> = any>(props: VoiceMotionProps<T>) => {
+  let result =
+    <Voice
+      voice={props.voice} 
+      voiceMotion={(segment: AudioSegment, waveform: WaveformData, variables: Record<string, Variable<VariableType>>, frames: number[]) => props.voiceMotion(segment, waveform, typeVariables(variables), frames)}
+      trim={props.trim}
+      fadeInFrames={props.fadeInFrames}
+      fadeOutFrames={props.fadeOutFrames}
+      volume={props.volume}
+      showWaveform={props.showWaveform}
+    />
+
+  return result
 }
 
 
