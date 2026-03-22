@@ -192,7 +192,7 @@ export const createSimpleLipSync = (mouthOptions: SimpleMouthOptions) => {
     return <VoiceMotion
       voice={voice}
       voiceMotion={(audioSegment, waveform, _, frames) => {
-        const amp = resolveSegmentAmplitude(audioSegment, waveform, frames[0], PROJECT_SETTINGS.fps)
+        const amp = resolveSegmentAmplitude(audioSegment, waveform, frames[frames.length - 1], PROJECT_SETTINGS.fps)
         return amp > threshold ? applyOption(mouthOptions, "Open") : applyOption(mouthOptions, "Closed")
       }}
       trim={trim}
