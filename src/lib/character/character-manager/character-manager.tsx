@@ -52,8 +52,9 @@ export const DialogueSenario = ({
         if (characters.get(elm.node.name)?.speakingClassName) {
             defaultClass = " " + characters.get(elm.node.name)!.speakingClassName
         }
+        const className = (elm.node.className ? elm.node.className : "") + defaultClass
         return (
-          <PsdCharacter key={elm.node.name} className={elm.node.className + defaultClass} psd={characters.get(elm.node.name)?.psd!}>
+          <PsdCharacter key={elm.node.name} className={className} psd={characters.get(elm.node.name)?.psd!}>
             {elm.node.children}
           </PsdCharacter>
         )
