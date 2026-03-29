@@ -82,7 +82,7 @@ import { Character } from "../src/lib/sound/character"
 
 ### `<PsdCharacter>`
 
-PSDファイルを利用した、口パクなどのアニメーションを制御します。
+PSD形式の立ち絵を利用した口パクなどのアニメーションを宣言します。
 `<PsdCharacter>`コンポーネント内で、専用のコンポーネントを利用してPSDのオプションを制御し、canvasへ描画します。
 コンポーネントを作成することもできますが、内部でフックを使うことは出来ません。
 
@@ -367,13 +367,13 @@ const blink = {
 
 <PsdCharacter psd="../assets/char.psd">
   <Voice voice="../assets/001_char.wav" />
-  <Blink data={lipsync} />
+  <Blink data={blink} />
 </PsdCharacter>
 ```
 
 ### `<DialogueScenerio>`
 
-PSD形式の立ち絵を利用して会話形式のシナリオを作成します。
+会話形式のシナリオにおいてPSD形式の立ち絵を利用して口パクなどのアニメーションを制御します。
 
 子要素として使用できる主なコンポーネントは次の通りです。
 
