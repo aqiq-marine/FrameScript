@@ -50,6 +50,28 @@ type DialogueScenarioProps = {
  * 
  * @param implicitPlacement 非話者キャラクターの前後配置
  * @param children シナリオDSL
+ *
+ * @example
+ * ```tsx
+ * <DialogueSenario>
+ *   <DeclareCharacters>
+ *     <DeclareCharacter idleClassName="akane" speakingClassName="akane" name="akane" psd="../assets/akane.psd" />
+ *     <DeclareCharacter idleClassName="aoi" speakingClassName="aoi" name="aoi" psd="../assets/aoi.psd" />
+ *   </DeclareCharacters>
+ *   <Scenario>
+ *     <Chapter>
+ *       <Speaker name="aoi">
+ *         <Voice voice="../assets/001_aoi.wav"/>
+ *       </Speaker>
+ *     </Chapter>
+ *     <Chapter>
+ *       <Speaker name="akane">
+ *         <Voice voice="../assets/002_akane.wav" />
+ *       </Speaker>
+ *     </Chapter>
+ *   </Scenario>
+ * </DialogueSenario>
+ * ```
  */
 export const DialogueScenario = ({
   implicitPlacement = "back",

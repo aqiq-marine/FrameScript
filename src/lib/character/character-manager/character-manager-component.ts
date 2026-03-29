@@ -66,6 +66,13 @@ export const Scenario = defineDSL<{
  * @param name シナリオ内で使用する一意な名前
  * @param psd 使用するPSDリソース
  * @param children 非話者時の見た目（PsdCharacterと同様）
+ *
+ * @example
+ * ```tsx
+ * <DeclareCharacter idleClassName="char" speakingClassName="char" name="char" psd="../assets/char.psd">
+ *   <Motion motion={(variables, frames) => {return {}}} />
+ * </DeclareCharacter">
+ * ```
  */
 export const DeclareCharacter = defineDSL<{
   idleClassName?: string

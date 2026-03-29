@@ -134,20 +134,11 @@ Serializes child elements.
 Internally, it uses `<Sequence>`, and each child is wrapped in a `<Clip>`.
 
 ```tsx
-import { MotionSequence, createSimpleLipSync } from "../src/lib/character/character-unit"
-
-const SimpleLipSync = createSimpleLipSync({
-  kind: "bool",
-  options: {
-    Default: "表情/口/1",
-    Open: "表情/口/1",
-    Closed: "表情/口/5",
-  }
-})
+import { MotionSequence, Voice } from "../src/lib/character/character-unit"
 
 <MotionSequence>
-  <SimpleLipSync voice="../assets/001_char.wav" />
-  <SimpleLipSync voice="../assets/002_char.wav" />
+  <Voice voice="../assets/001_char.wav" />
+  <Voice voice="../assets/002_char.wav" />
 </MotionSequence>
 ```
 
@@ -157,22 +148,13 @@ const SimpleLipSync = createSimpleLipSync({
 Used directly under `MotionSequence` to run child elements in parallel.
 
 ```tsx
-import { MotionSequence, MotionClip, createSimpleLipSync } from "../src/lib/character/character-unit"
-
-const SimpleLipSync = createSimpleLipSync({
-  kind: "bool",
-  options: {
-    Default: "表情/口/1",
-    Open: "表情/口/1",
-    Closed: "表情/口/5",
-  }
-})
+import { MotionSequence, MotionClip, Voice } from "../src/lib/character/character-unit"
 
 <MotionSequence>
-  <SimpleLipSync voice="../assets/001_char.wav" />
+  <Voice voice="../assets/001_char.wav" />
   <MotionClip>
-    <SimpleLipSync voice="../assets/002_char.wav" />
-    <SimpleLipSync voice="../assets/003_char.wav" />
+    <Voice voice="../assets/002_char.wav" />
+    <Voice voice="../assets/003_char.wav" />
   </MotionClip>
 </MotionSequence>
 ```
@@ -276,7 +258,7 @@ The component receives timing data via `data` to control lip-sync.
 Dictionary format is the same as above.
 
 ```tsx
-import { createLipSync } from "../src/lib/character/character-unit"
+import { Voice, createLipSync } from "../src/lib/character/character-unit"
 
 const LipSync = createLipSync({
   kind: "enum",
@@ -324,7 +306,7 @@ Mapping for `data.value`:
 | "D"   | "Closed"     |
 
 ```tsx
-import { createBlink, generateBlinkData } from "../src/lib/character/character-unit"
+import { Voice, createBlink, generateBlinkData } from "../src/lib/character/character-unit"
 
 const Blink = createBlink({
   kind: "enum",
@@ -395,24 +377,8 @@ Accepts the same child components as `<PsdCharacter>`.
 Specify the `name` declared in `<DeclareCharacter>` to display the corresponding PSD.
 
 ```tsx
-const AkaneLipSync = createSimpleLipSync({
-  kind: "enum",
-  options: {
-    Mouth: "目・口/口",
-    Default: "開き",
-    Open: "開き",
-    Closed: "閉じ",
-  }
-})
-
-const AoiLipSync = createSimpleLipSync({
-  kind: "bool",
-  options: {
-    Default: "全身/顔パーツ/口/お",
-    Open: "全身/顔パーツ/口/あ",
-    Closed: "全身/顔パーツ/口/にま",
-  }
-})
+import { DialogueScenario, DeclareCharacters, DeclareCharacter, Scenario, Chapter, Speaker } from "../src/lib/character/character-manager"
+import { Voice } from "../src/lib/character/character-unit"
 
 <DialogueSenario>
   <DeclareCharacters>
@@ -422,12 +388,12 @@ const AoiLipSync = createSimpleLipSync({
   <Scenario>
     <Chapter>
       <Speaker name="aoi">
-        <AoiLipSync voice="../assets/001_aoi.wav"/>
+        <Voice voice="../assets/001_aoi.wav"/>
       </Speaker>
     </Chapter>
     <Chapter>
       <Speaker name="akane">
-        <AkaneLipSync voice="../assets/002_akane.wav" />
+        <Voice voice="../assets/002_akane.wav" />
       </Speaker>
     </Chapter>
   </Scenario>
